@@ -53,7 +53,7 @@ fun StatusBanner(state: InterviewState, modifier: Modifier) {
     }
 }
 
-/** Lets you point the app at the Flask (ie the API of the engine ML). */
+/** point the app at the Flask (ie the API of the engine ML). */
 @Composable
 fun ServerDialog(state: InterviewState, onClose: () -> Unit) {
     var text by remember { mutableStateOf(state.baseUrl) }
@@ -63,8 +63,8 @@ fun ServerDialog(state: InterviewState, onClose: () -> Unit) {
         title = { Txt("Server address", 18, FontWeight.Bold) },
         text = {
             Column {
-                Txt(
-                    "Emulator: http://10.0.2.2:5000\nPhone on the same Wi-Fi: http://<your PC's IP>:5000",
+                Txt(/*if ur AVD voice is not captured u can use this*/
+                    "Emulator: http://10.0.2.2:5000\nPhone on the same Wi-Fi: http://<your PC's IP>:5000",/*change the values to ur own */
                     12, color = C.Muted, lineHeight = 18
                 )
                 Spacer(Modifier.height(12.dp))

@@ -34,6 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import android.util.Patterns
+import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.material3.Text
+
 
 
 
@@ -91,6 +95,7 @@ fun SignInScreen(state: InterviewState) {
     var showPassword by remember { mutableStateOf(false) }
     var info by remember { mutableStateOf<String?>(null) }
 
+
     Box(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -136,11 +141,13 @@ fun SignInScreen(state: InterviewState) {
             }
             Spacer(Modifier.height(20.dp))
 
-            PrimaryButton("Sign In", onClick = {
-                if (!email.contains("@") || password.isBlank()) {
+            PrimaryButton("Sign In", enabled = !state.loading, onClick = {
+                val e = email.trim()
+                if (!Patterns.EMAIL_ADDRESS.matcher(e).matches() || password.isBlank()) {
                     info = "Enter a valid email and your password."
                 } else {
-                    state.go(Screen.WELCOME)
+                    info = null
+                    state.signIn(e, password)
                 }
             })
             info?.let {
@@ -188,6 +195,7 @@ fun SignUpScreen(state: InterviewState) {
     var showConfirm by remember { mutableStateOf(false) }
     var agreed by remember { mutableStateOf(false) }
     var info by remember { mutableStateOf<String?>(null) }
+
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -246,16 +254,17 @@ fun SignUpScreen(state: InterviewState) {
             }
             Spacer(Modifier.height(20.dp))
 
-            PrimaryButton("Create Account", onClick = {
+            PrimaryButton("Create Account", enabled = !state.loading, onClick = {
+                val e = email.trim()
                 info = when {
                     name.isBlank() -> "Enter your full name."
-                    !email.contains("@") -> "Enter a valid email."
+                    !Patterns.EMAIL_ADDRESS.matcher(e).matches() -> "Enter a valid email, like name@gmail.com."
                     password.length < 8 -> "Password must be at least 8 characters."
                     password != confirm -> "The passwords do not match."
                     !agreed -> "Please accept the Terms of Service and Privacy Policy."
                     else -> null
                 }
-                if (info == null) state.go(Screen.WELCOME)
+                if (info == null) state.signUp(name.trim(), e, password)
             })
             info?.let {
                 Spacer(Modifier.height(12.dp))

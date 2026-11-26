@@ -40,7 +40,7 @@ abstract class ComposeFragment : Fragment() {
             setContent {
                 AppTheme {
                     AppBackground {
-                        Content()
+                        this@ComposeFragment.Content()
                         StatusBanner(state, Modifier.align(Alignment.TopCenter))
                     }
                 }

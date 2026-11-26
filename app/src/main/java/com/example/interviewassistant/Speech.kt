@@ -6,6 +6,8 @@ import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import java.util.Locale
+import android.media.AudioAttributes
+import android.util.Log
 
 /** Text-to-speech: the AI interviewer reads each question aloud. If speech is unavailable, it just continues silently. */
 class Speaker(context: Context) {
@@ -19,7 +21,16 @@ class Speaker(context: Context) {
         tts = TextToSpeech(context.applicationContext) { status ->
             val engine = tts
             if (status == TextToSpeech.SUCCESS && engine != null) {
-                engine.language = Locale.US
+                engine.setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build()
+                )
+                val r = engine.setLanguage(Locale.US)
+                if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("Speaker", "US English voice missing: install it in Text-to-speech settings")
+                }
                 engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {}
                     override fun onDone(utteranceId: String?) {
@@ -36,16 +47,17 @@ class Speaker(context: Context) {
                     }
                 })
                 ready = true
+            } else {
+                Log.e("Speaker", "TTS init failed, status=$status")
             }
         }
     }
-
     private fun finish() {
-        main.post {
+        main.postDelayed({
             val callback = pendingDone
             pendingDone = null
             callback?.invoke()
-        }
+        }, 400)
     }
 
     /** Speaks [text]; calls [onDone] on the main thread when finished (or at once if speech is unavailable). */

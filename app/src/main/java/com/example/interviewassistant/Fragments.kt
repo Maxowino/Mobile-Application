@@ -48,7 +48,7 @@ abstract class ComposeFragment : Fragment() {
         }
 }
 
-// ---- account -----------------------------------------------------------------------------
+//  account
 class SignInFragment : ComposeFragment() {
     @Composable override fun Content() = SignInScreen(state)
 }

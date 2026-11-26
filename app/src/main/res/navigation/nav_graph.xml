@@ -6,7 +6,9 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/nav_graph"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:startDestination="@id/welcomeFragment">
+    app:startDestination="@id/splashFragment">
+
+    <fragment android:id="@+id/splashFragment" android:name="com.example.interviewassistant.SplashFragment" android:label="Splash" />
 
     <fragment android:id="@+id/signInFragment" android:name="com.example.interviewassistant.SignInFragment" android:label="Sign in" />
     <fragment android:id="@+id/signUpFragment" android:name="com.example.interviewassistant.SignUpFragment" android:label="Create account" />

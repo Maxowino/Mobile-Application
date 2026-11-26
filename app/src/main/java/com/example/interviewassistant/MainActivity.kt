@@ -31,7 +31,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: Toolbar
 
     /** No toolbar (and no menu) on these screens: they draw their own header. */
-    private val noToolbar = setOf(R.id.signInFragment, R.id.signUpFragment, R.id.liveFragment)
+    private val noToolbar = setOf(
+        R.id.splashFragment, R.id.signInFragment, R.id.signUpFragment, R.id.liveFragment
+    )
 
     /** Pages opened from the menu; they get a back arrow. */
     private val menuPages = setOf(
@@ -39,11 +41,8 @@ class MainActivity : AppCompatActivity() {
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Splash screen: must be installed before super.onCreate. Held for a moment so the logo is seen.
-        val splash = installSplashScreen()
-        var hold = true
-        splash.setKeepOnScreenCondition { hold }
-        Handler(Looper.getMainLooper()).postDelayed({ hold = false }, 1200)
+        // Splash screen
+        installSplashScreen()
 
         super.onCreate(savedInstanceState)
         // dark app: always use light status-bar icons
@@ -66,11 +65,7 @@ class MainActivity : AppCompatActivity() {
         // Navigation: start at Welcome when someone is signed in, otherwise at Sign in
         val host = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = host.navController
-        val graph = navController.navInflater.inflate(R.navigation.nav_graph)
-        graph.setStartDestination(
-            if (FirebaseAuth.getInstance().currentUser != null) R.id.welcomeFragment else R.id.signInFragment
-        )
-        navController.graph = graph
+        navController.setGraph(R.navigation.nav_graph, null)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             toolbar.visibility = if (destination.id in noToolbar) View.GONE else View.VISIBLE
@@ -79,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             invalidateOptionsMenu()
         }
 
-        // The screens ask the shared state to navigate; we do it here.
+        // The screens ask the shared state to navigate
         state.onNavigate = { target -> navigateTo(target) }
         state.onBack = { navController.popBackStack() }
     }
@@ -90,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    // ---- navigation ------------------------------------------------------------------------
+    //  navigation
     private fun destinationOf(target: Screen): Int = when (target) {
         Screen.SIGN_IN -> R.id.signInFragment
         Screen.SIGN_UP -> R.id.signUpFragment
@@ -126,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // ---- menu --------------------------------------------------------------------------------
+    //  menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true

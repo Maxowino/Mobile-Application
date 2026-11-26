@@ -35,8 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
-// NOTE: there are no user accounts on the server. These two screens match the design but only
-// check the form fields locally, then move on. Real sign-in would need an auth endpoint in app.py.
+
 
 @Composable
 private fun FieldIcon(kind: String) {

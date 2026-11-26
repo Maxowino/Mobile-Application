@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Navigation design.
+     Start: Splash (theme) -> Sign in (no user) or Welcome (signed in).
+     Interview flow: Welcome > Career > CV > Ready > Live > Review.
+     Menu pages (top-right menu): Profile, Interview history (> past interview), Settings. -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_graph"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/welcomeFragment">
+
+    <fragment android:id="@+id/signInFragment" android:name="com.example.interviewassistant.SignInFragment" android:label="Sign in" />
+    <fragment android:id="@+id/signUpFragment" android:name="com.example.interviewassistant.SignUpFragment" android:label="Create account" />
+
+    <fragment android:id="@+id/welcomeFragment" android:name="com.example.interviewassistant.WelcomeFragment" android:label="Interview Assistant" />
+    <fragment android:id="@+id/careerFragment" android:name="com.example.interviewassistant.CareerFragment" android:label="Choose career" />
+    <fragment android:id="@+id/cvFragment" android:name="com.example.interviewassistant.CvFragment" android:label="Upload CV" />
+    <fragment android:id="@+id/readyFragment" android:name="com.example.interviewassistant.ReadyFragment" android:label="Ready" />
+    <fragment android:id="@+id/liveFragment" android:name="com.example.interviewassistant.LiveFragment" android:label="Live interview" />
+    <fragment android:id="@+id/reviewFragment" android:name="com.example.interviewassistant.ReviewFragment" android:label="Your review" />
+
+    <fragment android:id="@+id/profileFragment" android:name="com.example.interviewassistant.ProfileFragment" android:label="Profile" />
+    <fragment android:id="@+id/historyFragment" android:name="com.example.interviewassistant.HistoryFragment" android:label="Interview history" />
+    <fragment android:id="@+id/historyDetailFragment" android:name="com.example.interviewassistant.HistoryDetailFragment" android:label="Past interview" />
+    <fragment android:id="@+id/settingsFragment" android:name="com.example.interviewassistant.SettingsFragment" android:label="Settings" />
+</navigation>

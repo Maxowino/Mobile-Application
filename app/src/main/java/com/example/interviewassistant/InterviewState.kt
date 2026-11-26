@@ -3,19 +3,29 @@ package com.example.interviewassistant
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
+/** The screens the flow can move to. MainActivity maps each one to a Fragment destination. */
 enum class Screen { SIGN_IN, SIGN_UP, WELCOME, CAREER, CV, READY, LIVE, REVIEW }
 
 /** The design shows "5 questions" per career and "Q1/5" in the live interview. */
 const val QUESTIONS_PER_INTERVIEW = 5
 
-/** Everything the screens show. Network calls run on a background thread; state is updated on the main thread. */
-class InterviewState {
-    var screen by mutableStateOf(Screen.SIGN_IN)
+/**
+ * Everything the screens show. It is a ViewModel shared by all Fragments (activityViewModels),
+ * so the interview survives screen changes and rotation.
+ * Network calls run on a background thread; state is updated on the main thread.
+ */
+class InterviewState : ViewModel() {
+    /** Set by MainActivity: moves to a screen / goes back using the Navigation component. */
+    var onNavigate: ((Screen) -> Unit)? = null
+    var onBack: (() -> Unit)? = null
+
     var baseUrl by mutableStateOf(Api.baseUrl)
     var careers by mutableStateOf<List<Career>>(emptyList())
     var selectedCareer by mutableStateOf<String?>(null)
@@ -52,31 +62,72 @@ class InterviewState {
         }
     }
 
-    // ---- navigation ------------------------------------------------------------------
+    // ---- navigation (handled by MainActivity / NavController) -----------------------------
     fun go(target: Screen) {
         error = null
-        screen = target
+        onNavigate?.invoke(target)
     }
 
-    val canGoBack: Boolean
-        get() = screen != Screen.SIGN_IN && screen != Screen.WELCOME
-
     fun back() {
-        when (screen) {
-            Screen.SIGN_UP -> go(Screen.SIGN_IN)
-            Screen.CAREER -> go(Screen.WELCOME)
-            Screen.CV -> go(Screen.CAREER)
-            Screen.READY -> go(Screen.CV)
-            Screen.LIVE -> go(Screen.READY)
-            Screen.REVIEW -> go(Screen.WELCOME)
-            else -> Unit
-        }
+        onBack?.invoke()
     }
 
     fun setServer(url: String) {
         baseUrl = url
         Api.baseUrl = url.trim()
         careers = emptyList()
+    }
+
+    // ---- Firebase accounts ---------------------------------------------------------------
+    fun signIn(email: String, password: String) {
+        if (loading) return
+        loading = true
+        error = null
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+                loading = false
+                go(Screen.WELCOME)
+            }
+            .addOnFailureListener {
+                loading = false
+                error = it.message ?: "Sign in failed."
+            }
+    }
+
+    fun signUp(name: String, email: String, password: String) {
+        if (loading) return
+        loading = true
+        error = null
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+                Repo.saveProfile(name) {
+                    loading = false
+                    go(Screen.WELCOME)
+                }
+            }
+            .addOnFailureListener {
+                loading = false
+                error = it.message ?: "Sign up failed."
+            }
+    }
+
+    fun signOut() {
+        FirebaseAuth.getInstance().signOut()
+        resetSession()
+        go(Screen.SIGN_IN)
+    }
+
+    /** Forget everything from the previous user/interview. */
+    private fun resetSession() {
+        selectedCareer = null
+        cvName = null
+        sessionId = ""
+        career = ""
+        question = null
+        answerText = ""
+        lastNote = null
+        report = null
+        error = null
     }
 
     // ---- API actions -----------------------------------------------------------------
@@ -92,7 +143,7 @@ class InterviewState {
             answerText = ""
             lastNote = null
             report = null
-            screen = Screen.LIVE
+            go(Screen.LIVE)
         }
     }
 
@@ -118,7 +169,9 @@ class InterviewState {
         val id = sessionId
         guarded { Api.feedback(id) }?.let {
             report = it
-            screen = Screen.REVIEW
+            // keep the finished interview in Firestore so it shows up in "Interview history"
+            if (it.questions.isNotEmpty()) Repo.saveInterview(it) { }
+            go(Screen.REVIEW)
         }
     }
 }

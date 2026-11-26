@@ -9,6 +9,7 @@ import java.util.Locale
 
 /** Text-to-speech: the AI interviewer reads each question aloud. If speech is unavailable, it just continues silently. */
 class Speaker(context: Context) {
+    private val app = context.applicationContext
     private val main = Handler(Looper.getMainLooper())
     private var tts: TextToSpeech? = null
     private var ready = false
@@ -50,10 +51,12 @@ class Speaker(context: Context) {
     /** Speaks [text]; calls [onDone] on the main thread when finished (or at once if speech is unavailable). */
     fun speak(text: String, onDone: () -> Unit) {
         val engine = tts
-        if (!ready || engine == null) {
+        // Settings > "Read questions aloud" off, or speech unavailable: carry on silently
+        if (!ready || engine == null || !AppPrefs.readAloud(app)) {
             onDone()
             return
         }
+        engine.setSpeechRate(AppPrefs.rate(app))
         pendingDone = onDone
         engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "question")
     }

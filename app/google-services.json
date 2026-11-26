@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "512205608190",
+    "project_id": "interviewassistant-fd186",
+    "storage_bucket": "interviewassistant-fd186.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512205608190:android:804e8e2a0707bf7a5d01af",
+        "android_client_info": {
+          "package_name": "com.example.interviewassistant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCm9JPa8QV8ivjy9DbOmBsiZJ1m0gJk9yA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

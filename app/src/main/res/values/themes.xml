@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Normal theme (AppCompat so the Toolbar and its menu work). Compose screens draw their own dark UI. -->
+    <style name="Theme.InterviewAssistant" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">#07091A</item>
+        <item name="colorPrimary">#07091A</item>
+        <item name="colorPrimaryDark">#07091A</item>
+        <item name="colorAccent">#685FFC</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 
-    <style name="Theme.InterviewAssistant" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Splash screen theme: shown at launch, then switched to Theme.InterviewAssistant -->
+    <style name="Theme.InterviewAssistant.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#07091A</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.InterviewAssistant</item>
+    </style>
 </resources>

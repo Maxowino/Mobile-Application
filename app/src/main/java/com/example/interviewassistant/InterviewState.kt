@@ -9,6 +9,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 
 /** The screens the flow can move to. MainActivity maps each one to a Fragment destination. */
 enum class Screen { SIGN_IN, SIGN_UP, WELCOME, CAREER, CV, READY, LIVE, REVIEW }
@@ -62,7 +68,7 @@ class InterviewState : ViewModel() {
         }
     }
 
-    // ---- navigation (handled by MainActivity / NavController) -----------------------------
+    // navigation (handled by MainActivity / NavController)
     fun go(target: Screen) {
         error = null
         onNavigate?.invoke(target)
@@ -78,7 +84,7 @@ class InterviewState : ViewModel() {
         careers = emptyList()
     }
 
-    // ---- Firebase accounts ---------------------------------------------------------------
+    // Firebase accounts
     fun signIn(email: String, password: String) {
         if (loading) return
         loading = true
@@ -90,7 +96,7 @@ class InterviewState : ViewModel() {
             }
             .addOnFailureListener {
                 loading = false
-                error = it.message ?: "Sign in failed."
+                error = signInError(it)
             }
     }
 
@@ -107,7 +113,7 @@ class InterviewState : ViewModel() {
             }
             .addOnFailureListener {
                 loading = false
-                error = it.message ?: "Sign up failed."
+                error = signUpError(it)
             }
     }
 
@@ -130,7 +136,7 @@ class InterviewState : ViewModel() {
         error = null
     }
 
-    // ---- API actions -----------------------------------------------------------------
+    // API actions
     suspend fun loadCareers() {
         guarded { Api.careers() }?.let { careers = it }
     }
@@ -174,4 +180,20 @@ class InterviewState : ViewModel() {
             go(Screen.REVIEW)
         }
     }
+}
+private fun signInError(e: Exception): String = when (e) {
+    is FirebaseAuthInvalidCredentialsException,
+    is FirebaseAuthInvalidUserException -> "Wrong email or password."
+    is FirebaseNetworkException -> "No internet connection. Check your network and try again."
+    is FirebaseTooManyRequestsException -> "Too many attempts. Try again later."
+    else -> "Sign in failed. Please try again."
+}
+
+private fun signUpError(e: Exception): String = when (e) {
+    is FirebaseAuthUserCollisionException -> "An account with this email already exists."
+    is FirebaseAuthWeakPasswordException -> "That password is too weak. Use a stronger one."
+    is FirebaseAuthInvalidCredentialsException -> "Enter a valid email address."
+    is FirebaseNetworkException -> "No internet connection. Check your network and try again."
+    is FirebaseTooManyRequestsException -> "Too many attempts. Try again later."
+    else -> "Sign up failed. Please try again."
 }

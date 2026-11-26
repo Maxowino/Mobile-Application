@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** Colours sampled from the Figma screenshots. */
+
 object C {
     val Bg = Color(0xFF07091A)
     val Card = Color(0xFF11152D)
@@ -95,7 +95,7 @@ fun AppTheme(content: @Composable () -> Unit) {
     }
 }
 
-/** Dark background with the two soft glows seen in the design. */
+
 @Composable
 fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     Box(
@@ -122,7 +122,7 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     )
 }
 
-/** Text with the sizes/weights used across the design. */
+
 @Composable
 fun Txt(
     text: String,
@@ -148,7 +148,7 @@ fun Txt(
     )
 }
 
-/** Small uppercase monospace label, e.g. EMAIL, LIVE INTERVIEW. */
+
 @Composable
 fun MonoLabel(text: String, color: Color = C.Muted, modifier: Modifier = Modifier) {
     Txt(text, 11, FontWeight.Medium, color, modifier, mono = true, spacing = 1.5f)
@@ -308,7 +308,7 @@ fun Logo() {
     }
 }
 
-/** Purple circle with a soft glow (welcome screen and the live-interview avatar). */
+
 @Composable
 fun AvatarCircle(size: Dp) {
     Box(Modifier.size(size * 1.6f), contentAlignment = Alignment.Center) {

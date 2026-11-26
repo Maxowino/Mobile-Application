@@ -117,7 +117,7 @@ class InterviewState : ViewModel() {
         go(Screen.SIGN_IN)
     }
 
-    /** Forget everything from the previous user/interview. */
+    /** Forget everything from the previous user */
     private fun resetSession() {
         selectedCareer = null
         cvName = null

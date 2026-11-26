@@ -304,7 +304,7 @@ fun ReadyScreen(state: InterviewState) {
                 14, color = C.Muted, lineHeight = 22
             )
             Spacer(Modifier.height(4.dp))
-            FeatureRow("🎤", "Use your voice", "Tap the mic to answer out loud — just like a real interview")
+            FeatureRow("🎤", "Use your voice", "Tap the mic to answer out loud")
             FeatureRow("👂", "Listen carefully", "The AI interviewer will speak the questions aloud")
             FeatureRow("🧠", "Adaptive follow-ups", "Questions adapt to what you say in real time")
             FeatureRow("📊", "Detailed review", "Get scored and receive specific improvement tips")

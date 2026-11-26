@@ -47,7 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
-/** Animated bars shown while the AI interviewer is speaking. */
+/** Animated bars shown while the AI is reading the question aloud. */
 @Composable
 private fun Waveform(active: Boolean) {
     val transition = rememberInfiniteTransition(label = "wave")

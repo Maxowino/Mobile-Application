@@ -53,7 +53,7 @@ fun StatusBanner(state: InterviewState, modifier: Modifier) {
     }
 }
 
-/** Lets you point the app at the Flask server (Welcome screen and Settings). */
+/** Lets you point the app at the Flask (ie the API of the engine ML). */
 @Composable
 fun ServerDialog(state: InterviewState, onClose: () -> Unit) {
     var text by remember { mutableStateOf(state.baseUrl) }

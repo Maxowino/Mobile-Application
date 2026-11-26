@@ -70,9 +70,9 @@ private fun JSONObject.toQuestion(): Question = Question(
     category = getString("category")
 )
 
-/** Talks to the Flask API (app.py). Uses only classes that ship with Android, so no extra libraries. */
+/** Talks to the Flask API (app.py) */
 object Api {
-    // 10.0.2.2 = your PC, seen from the Android emulator. For a real phone use your PC's Wi-Fi address.
+
     var baseUrl: String = "http://10.0.2.2:5000"
 
     private fun request(method: String, path: String, body: JSONObject? = null): JSONObject {

@@ -42,9 +42,8 @@ private fun levelColor(level: String): Color = when (level) {
     else -> C.Red
 }
 
-// ------------------------------------------------------------------------------------------
 // Profile
-// ------------------------------------------------------------------------------------------
+
 @Composable
 private fun StatCard(label: String, value: String, modifier: Modifier) {
     Column(
@@ -59,9 +58,11 @@ private fun StatCard(label: String, value: String, modifier: Modifier) {
 
 @Composable
 fun ProfileScreen() {
+    val context = LocalContext.current
     var name by remember { mutableStateOf("") }
     var info by remember { mutableStateOf<String?>(null) }
     var items by remember { mutableStateOf<List<HistoryItem>?>(null) }
+    var showPassword by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         Repo.loadProfile { name = it }
@@ -107,12 +108,27 @@ fun ProfileScreen() {
             Spacer(Modifier.height(12.dp))
             Txt(it, 12, color = C.Muted)
         }
+
+        Spacer(Modifier.height(24.dp))
+        MonoLabel("SECURITY")
+        Spacer(Modifier.height(8.dp))
+        SecondaryButton("Change password", onClick = { showPassword = true })
+        Spacer(Modifier.height(16.dp))
+    }
+
+    if (showPassword) {
+        ChangePasswordDialog(
+            onClose = { showPassword = false },
+            onChanged = {
+                android.widget.Toast.makeText(context, "Password updated", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        )
     }
 }
 
-// ------------------------------------------------------------------------------------------
+
 // Interview history
-// ------------------------------------------------------------------------------------------
+
 private val dateFormat = SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault())
 
 @Composable
@@ -163,9 +179,8 @@ fun HistoryScreen(onOpen: (String) -> Unit) {
     }
 }
 
-// ------------------------------------------------------------------------------------------
+
 // Settings
-// ------------------------------------------------------------------------------------------
 @Composable
 private fun SpeedChip(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     Box(

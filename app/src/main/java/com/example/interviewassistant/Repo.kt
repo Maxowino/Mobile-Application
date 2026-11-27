@@ -7,6 +7,12 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import org.json.JSONArray
 import org.json.JSONObject
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 
 /** One row of the history list. The full report is loaded only when the row is opened. */
 data class HistoryItem(
@@ -83,9 +89,22 @@ object Repo {
             }
             .addOnFailureListener { result(null) }
     }
+    /** [done] gets null on success, or a message to show the user. */
+    fun changePassword(current: String, new: String, done: (String?) -> Unit) {
+        val user = auth.currentUser
+        val mail = user?.email
+        if (user == null || mail == null) return done("You are not signed in.")
+        user.reauthenticate(EmailAuthProvider.getCredential(mail, current))
+            .addOnSuccessListener {
+                user.updatePassword(new)
+                    .addOnSuccessListener { done(null) }
+                    .addOnFailureListener { done(passwordError(it, afterReauth = true)) }
+            }
+            .addOnFailureListener { done(passwordError(it, afterReauth = false)) }
+    }
 }
 
-// ---- Report <-> JSON (stored as one string, so the Review screen can be reused for history) ----
+//  Report <-> JSON (stored as one string, so the Review screen can be reused for history)
 
 private fun List<String>.toJsonArray() = JSONArray().also { a -> forEach { a.put(it) } }
 private fun JSONArray.strings(): List<String> = List(length()) { getString(it) }
@@ -131,4 +150,14 @@ private fun reportFromJson(j: JSONObject): Report {
             )
         }
     )
+}
+private fun passwordError(e: Exception, afterReauth: Boolean): String = when (e) {
+    is FirebaseAuthInvalidCredentialsException,
+    is FirebaseAuthInvalidUserException ->
+        if (afterReauth) "Could not update the password. Sign in again and retry."
+        else "Current password is wrong."
+    is FirebaseAuthWeakPasswordException -> "That password is too weak. Use a stronger one."
+    is FirebaseNetworkException -> "No internet connection. Check your network and try again."
+    is FirebaseTooManyRequestsException -> "Too many attempts. Try again later."
+    else -> "Could not change the password. Please try again."
 }
